@@ -1,14 +1,18 @@
+import 'package:demo_flutter_firebase_auth/screens/Authentication/authentication.dart';
 import 'package:demo_flutter_firebase_auth/screens/Authentication/login.dart';
+import 'package:demo_flutter_firebase_auth/screens/wrapper.dart';
+import 'package:demo_flutter_firebase_auth/services/authentication_services/auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  // runApp(const MyApp());
-  runApp(Login());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // const MyApp({Key? key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,19 @@ class MyApp extends StatelessWidget {
         if (snapshot.hasError) {
           return const ErrorWidget();
         } else if (snapshot.hasData) {
-          return Login();
+          return MultiProvider(
+            providers: [
+              ChangeNotifierProvider<AuthServices>.value(value: AuthServices()),
+              StreamProvider<User>.value(
+                value: AuthServices().user,
+                initialData: null,
+              )
+            ],
+            child: const MaterialApp(
+              debugShowCheckedModeBanner: false,
+              home: Wrapper(),
+            ),
+          );
         } else {
           return const Loading();
         }
@@ -36,7 +52,7 @@ class ErrorWidget extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
-          children: [Icon(Icons.error), Text('Something went wrong !')],
+          children: const [Icon(Icons.error), Text('Something went wrong !')],
         ),
       ),
     );
@@ -55,16 +71,3 @@ class Loading extends StatelessWidget {
     );
   }
 }
-
-  // This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter Login/Signup Demo',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: const MyHomePage(title: 'Flutter Login/Signup Demo Home Page'),
-//     );
-//   }
-// }
